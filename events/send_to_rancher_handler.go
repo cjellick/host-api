@@ -5,6 +5,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 	"github.com/rancherio/go-machine-service/locks"
 	rclient "github.com/rancherio/go-rancher/client"
+	"time"
 )
 
 type SendToRancherHandler struct {
@@ -28,6 +29,9 @@ func (h *SendToRancherHandler) Handle(event *docker.APIEvents) error {
 	}
 	defer lock.Unlock()
 
+	if event.Status == "create" {
+		time.Sleep(time.Millisecond * 300)
+	}
 	container, err := h.client.InspectContainer(event.ID)
 	if err != nil {
 		if _, ok := err.(*docker.NoSuchContainer); !ok {
